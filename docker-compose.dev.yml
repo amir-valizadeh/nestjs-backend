@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0-alpine
+    container_name: portfolio_mysql_dev
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${DB_NAME:-portfolio_db}
+      MYSQL_USER: ${DB_USERNAME:-edy}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-edy123}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    networks:
+      - portfolio_network_dev
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: portfolio_backend_dev
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    ports:
+      - '${PORT:-3001}:3001'
+      - '9229:9229' # Node.js debug port
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - portfolio_network_dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    command: npm run start:dev
+
+volumes:
+  mysql_data_dev:
+    driver: local
+
+networks:
+  portfolio_network_dev:
+    driver: bridge
