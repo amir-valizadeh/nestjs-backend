@@ -1,45 +1,3 @@
-# Multi-stage build for better caching and smaller final image
-FROM node:20-alpine AS base
-
-# Set working directory
-WORKDIR /app
-
-# Copy package files for dependency caching
-COPY package*.json ./
-
-# Install dependencies with cache mount
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --only=production && npm cache clean --force
-
-# Development stage
-FROM base AS development
-
-# Install all dependencies (including dev dependencies)
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
-
-# Copy source code
-COPY . .
-
-# Expose port
-EXPOSE 3001
-
-# Start development server
-CMD ["npm", "run", "start:dev"]
-
-# Build stage
-FROM base AS build
-
-# Install all dependencies for building
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
-
-# Copy source code
-COPY . .
-
-# Build the application
-RUN npm run build
-
 # Production stage
 FROM node:20-alpine AS production
 
@@ -59,6 +17,10 @@ RUN --mount=type=cache,target=/root/.npm \
 
 # Copy built application from build stage
 COPY --from=build --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=build --chown=nestjs:nodejs /app/package.json ./package.json
+
+# Create logs directory with proper permissions
+RUN mkdir -p logs && chown nestjs:nodejs logs
 
 # Switch to non-root user
 USER nestjs
@@ -66,9 +28,9 @@ USER nestjs
 # Expose port
 EXPOSE 3001
 
-# Health check using wget (built into Alpine)
+# Health check using node instead of wget
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1
+    CMD node -e "require('http').get('http://localhost:3001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
 
-# Start production server
-CMD ["npm", "run", "start:prod"]
+# Start production server directly
+CMD ["node", "dist/main"]
