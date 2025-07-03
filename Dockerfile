@@ -70,4 +70,4 @@ USER nestjs
 EXPOSE 3001
 
 # Start production server directly
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]
