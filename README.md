@@ -2,6 +2,8 @@
 
 A comprehensive NestJS backend API for managing cryptocurrency portfolios with real-time price data from Bitazza exchange, user authentication, and portfolio performance tracking.
 
+## 🌐 **Production URL**: https://65.109.209.105
+
 ## 🚀 Recent Improvements
 
 ### Fixed Issues:
@@ -239,35 +241,35 @@ FRONTEND_URL=http://localhost:3000
 ### Authentication Endpoints
 
 ```http
-POST /auth/register
-POST /auth/login
+POST /api/auth/register
+POST /api/auth/login
 ```
 
 ### Portfolio Endpoints
 
 ```http
-GET    /portfolio              # Get user portfolios (paginated)
-POST   /portfolio              # Create new portfolio entry
-GET    /portfolio/:id          # Get specific portfolio
-PATCH  /portfolio/:id          # Update portfolio
-DELETE /portfolio/:id          # Delete portfolio
-GET    /portfolio/performance  # Get portfolio performance
+GET    /api/portfolio              # Get user portfolios (paginated)
+POST   /api/portfolio              # Create new portfolio entry
+GET    /api/portfolio/:id          # Get specific portfolio
+PATCH  /api/portfolio/:id          # Update portfolio
+DELETE /api/portfolio/:id          # Delete portfolio
+GET    /api/portfolio/performance  # Get portfolio performance
 ```
 
 ### Price Endpoints
 
 ```http
-GET /price/current             # Get current prices
-GET /price/symbols            # Get available symbols
-GET /price/cryptocurrencies    # Get detailed cryptocurrency data
-GET /price/:symbol            # Get specific cryptocurrency price
-POST /price/seed               # Seed initial cryptocurrency data
+GET /api/price/current             # Get current prices
+GET /api/price/symbols            # Get available symbols
+GET /api/price/cryptocurrencies    # Get detailed cryptocurrency data
+GET /api/price/:symbol            # Get specific cryptocurrency price
+POST /api/price/seed               # Seed initial cryptocurrency data
 ```
 
 ### Health Check
 
 ```http
-GET /health                   # Health check endpoint
+GET /api/health                   # Health check endpoint
 ```
 
 ### Interactive Documentation
