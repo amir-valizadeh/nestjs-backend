@@ -28,6 +28,9 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
+  // Set global prefix for all routes
+  app.setGlobalPrefix('api');
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -68,11 +71,13 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
-  logger.log(`Application is running on: http://localhost:${port}`);
-  logger.log(`API Documentation available at: http://localhost:${port}/api`);
+  logger.log(`Application is running on: http://localhost:${port}/api`);
+  logger.log(
+    `API Documentation available at: http://localhost:${port}/api/docs`,
+  );
 }
 void bootstrap();
